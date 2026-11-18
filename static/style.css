@@ -358,8 +358,28 @@ a:hover > .stat-card {
     padding: 0.85rem 1rem;
 }
 
+/* Edit / Delete buttons: same width on every list page */
+.table-actions {
+    width: 1%; /* shrink the cell to fit the buttons */
+    white-space: nowrap;
+}
+
+.table-actions .btn {
+    display: block;
+    width: 100%;
+    min-width: 5rem;
+    text-align: center;
+}
+
 .table-actions form {
-    display: inline;
+    display: block;
+    margin-top: 0.35rem;
+}
+
+/* Wide enough that the dropdown arrow doesn't clip "Screening" / "Withdrawn" */
+.status-filter {
+    min-width: 12rem;
+    padding-right: 2.5rem;
 }
 
 /* ---------- Buttons, badges, forms ---------- */
