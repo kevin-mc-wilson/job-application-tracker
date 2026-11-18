@@ -1,7 +1,7 @@
 import json
 import os
 import re
-from datetime import date
+from datetime import date, datetime
 
 from flask import Flask, abort, flash, redirect, render_template, request, url_for
 from database import get_db
@@ -9,6 +9,14 @@ from database import get_db
 app = Flask(__name__)
 # Needed for flash messages. Set SECRET_KEY in .env for anything beyond local dev.
 app.secret_key = os.environ.get("SECRET_KEY", "dev-only-secret-key")
+
+
+def greeting_for(hour):
+    if hour < 12:
+        return "Good morning"
+    if hour < 18:
+        return "Good afternoon"
+    return "Good evening"
 
 
 @app.route("/")
@@ -58,6 +66,9 @@ def dashboard():
         stats=stats,
         status_counts=status_counts,
         recent=recent,
+        greeting=greeting_for(datetime.now().hour),
+        today=datetime.now().strftime("%A, %-d %B %Y"),
+        user_name=os.environ.get("APP_USER_NAME", "").strip(),
     )
 
 
@@ -877,6 +888,82 @@ def delete_contact(contact_id):
         conn.close()
     flash(f"Deleted contact “{contact['contact_name']}”.", "warning")
     return redirect(url_for("contacts"))
+
+
+# ---------------------------------------------------------------- Job Match
+
+def normalize_skill(skill):
+    """Case-insensitive, whitespace-insensitive key for comparing skills."""
+    return " ".join(skill.lower().split())
+
+
+def calculate_matches(user_skills, jobs):
+    """Rank jobs by how many of their required skills the user has.
+
+    user_skills: list of skill strings entered by the user.
+    jobs: rows with job_title, company_name and a 'requirements' JSON value.
+
+    Returns (ranked, no_skills_count). Each ranked item is a dict with
+    percent, matched, missing, total and the job fields. Jobs that list no
+    skills can't be scored, so they are counted separately instead.
+    """
+    have = {normalize_skill(s) for s in user_skills}
+    ranked, no_skills = [], 0
+
+    for job in jobs:
+        required = split_list(", ".join(parse_requirements(job["requirements"])["skills"]))
+        if not required:
+            no_skills += 1
+            continue
+        matched = [s for s in required if normalize_skill(s) in have]
+        missing = [s for s in required if normalize_skill(s) not in have]
+        ranked.append(
+            {
+                **job,
+                "required": required,
+                "matched": matched,
+                "missing": missing,
+                "total": len(required),
+                "percent": round(len(matched) / len(required) * 100),
+            }
+        )
+
+    ranked.sort(key=lambda r: (-r["percent"], -len(r["matched"]), r["job_title"].lower()))
+    return ranked, no_skills
+
+
+@app.route("/job-match")
+def job_match():
+    skills_text = request.args.get("skills", "").strip()
+    user_skills = split_list(skills_text)
+    results, no_skills = [], 0
+
+    if user_skills:
+        conn = get_db()
+        try:
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute(
+                """
+                SELECT j.job_id, j.job_title, j.job_type, j.salary_min, j.salary_max,
+                       j.job_url, j.requirements, c.company_name
+                FROM jobs j JOIN companies c ON j.company_id = c.company_id
+                """
+            )
+            jobs_rows = cursor.fetchall()
+        finally:
+            conn.close()
+        results, no_skills = calculate_matches(user_skills, jobs_rows)
+    elif "skills" in request.args:
+        flash("Enter at least one skill, separated by commas.", "warning")
+
+    return render_template(
+        "job_match.html",
+        skills_text=skills_text,
+        user_skills=user_skills,
+        results=results,
+        no_skills=no_skills,
+        searched=bool(user_skills),
+    )
 
 
 if __name__ == "__main__":
