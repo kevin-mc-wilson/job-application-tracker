@@ -3,50 +3,62 @@
 {% block title %}Dashboard - Job Tracker{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Dashboard</h1>
-
-<div class="row g-3 mb-4">
-    {% for label, value, link in [
-        ('Applications', stats.applications, '/applications'),
-        ('Jobs', stats.jobs, '/jobs'),
-        ('Companies', stats.companies, '/companies'),
-        ('Contacts', stats.contacts, '/contacts')
-    ] %}
-    <div class="col-6 col-lg-3">
-        <a href="{{ link }}" class="text-decoration-none text-reset">
-            <div class="card stat-card h-100">
-                <div class="card-body">
-                    <div class="text-muted">{{ label }}</div>
-                    <div class="stat-number">{{ value }}</div>
-                </div>
-            </div>
-        </a>
+<div class="page-header">
+    <div>
+        <h1>{{ greeting }}{% if user_name %}, {{ user_name }}{% endif %}</h1>
+        <div class="text-muted">{{ today }}</div>
     </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('add_job') }}" class="btn btn-light"><i class="bi bi-plus-lg me-1"></i>Job</a>
+        <a href="{{ url_for('add_application') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Application</a>
+    </div>
+</div>
+
+<div class="stat-card metric-panel mb-3">
+    {% for label, value, link, bars in [
+        ('Applications', stats.applications, '/applications', [40, 55, 35, 70, 50, 85, 60]),
+        ('Jobs', stats.jobs, '/jobs', [30, 45, 60, 40, 65, 55, 75]),
+        ('Companies', stats.companies, '/companies', [50, 35, 55, 45, 60, 50, 70]),
+        ('Contacts', stats.contacts, '/contacts', [25, 40, 35, 55, 45, 65, 60])
+    ] %}
+    <a href="{{ link }}" class="metric">
+        <div class="metric-label">{{ label }} <span class="metric-pill">View</span></div>
+        <div class="metric-number">{{ value }}</div>
+        <div class="metric-bars" aria-hidden="true">
+            {% for h in bars %}<span style="height: {{ h }}%"></span>{% endfor %}
+        </div>
+    </a>
     {% endfor %}
 </div>
 
 <div class="row g-3">
     <div class="col-lg-4">
         <div class="card stat-card h-100">
-            <div class="card-header bg-white fw-semibold">Applications by Status</div>
-            <ul class="list-group list-group-flush">
-                {% for row in status_counts %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    {{ row.status }}
-                    <span class="badge bg-primary rounded-pill">{{ row.count }}</span>
-                </li>
-                {% else %}
-                <li class="list-group-item text-muted">No applications yet.</li>
-                {% endfor %}
-            </ul>
+            <div class="card-header">Applications by status</div>
+            {% set total = stats.applications or 1 %}
+            {% for row in status_counts %}
+            <div class="status-row">
+                <div class="d-flex justify-content-between">
+                    <span>{{ row.status }}</span>
+                    <span class="text-muted">{{ row.count }}</span>
+                </div>
+                <div class="bar"><span style="width: {{ (row.count / total * 100) | round | int }}%"></span></div>
+            </div>
+            {% else %}
+            <div class="p-3 text-muted">No applications yet.</div>
+            {% endfor %}
+            <div class="pb-2"></div>
         </div>
     </div>
 
     <div class="col-lg-8">
         <div class="card stat-card h-100">
-            <div class="card-header bg-white fw-semibold">Recent Applications</div>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                Recent applications
+                <a href="{{ url_for('applications') }}" class="small text-decoration-none">View all</a>
+            </div>
             <div class="table-responsive">
-                <table class="table mb-0">
+                <table class="table">
                     <thead>
                         <tr>
                             <th>Company</th>
@@ -58,10 +70,10 @@
                     <tbody>
                         {% for app in recent %}
                         <tr>
-                            <td>{{ app.company_name }}</td>
+                            <td class="fw-medium">{{ app.company_name }}</td>
                             <td>{{ app.job_title }}</td>
-                            <td>{{ app.application_date }}</td>
-                            <td>{{ app.status }}</td>
+                            <td class="text-muted">{{ app.application_date }}</td>
+                            <td><span class="badge text-bg-light border">{{ app.status }}</span></td>
                         </tr>
                         {% else %}
                         <tr><td colspan="4" class="text-muted">No applications yet.</td></tr>

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Job Match - Job Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="mb-0">Job Match</h1>
+</div>
+
+<div class="card stat-card mb-4">
+    <div class="card-body">
+        <form method="get" action="{{ url_for('job_match') }}">
+            <label for="skills" class="form-label fw-semibold">Your skills</label>
+            <div class="input-group">
+                <input type="text" class="form-control" id="skills" name="skills"
+                       placeholder="Python, SQL, Flask" value="{{ skills_text }}" autofocus>
+                <button type="submit" class="btn btn-primary">Find Matching Jobs</button>
+            </div>
+            <div class="form-text">Separate skills with commas. Matching ignores capitalization.</div>
+        </form>
+    </div>
+</div>
+
+{% if searched %}
+    <h2 class="h5 mb-3">
+        Matching Jobs
+        <small class="text-muted fw-normal">for {{ user_skills | join(', ') }}</small>
+    </h2>
+
+    {% for r in results %}
+    {% set tone = 'success' if r.percent >= 75 else ('warning' if r.percent >= 40 else 'secondary') %}
+    <div class="card stat-card mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                <div>
+                    <div class="fw-semibold fs-5">
+                        {{ loop.index }}. {{ r.job_title }} at {{ r.company_name }}
+                    </div>
+                    <div class="text-muted small">
+                        {{ r.job_type or '' }}
+                        {% if r.job_url %}{{ '· ' if r.job_type }}<a href="{{ r.job_url }}" target="_blank" rel="noopener">View posting</a>{% endif %}
+                    </div>
+                </div>
+                <div class="text-end">
+                    <span class="fs-4 fw-bold text-{{ tone }}">{{ r.percent }}%</span>
+                    <div class="small text-muted">({{ r.matched | length }}/{{ r.total }} skills)</div>
+                </div>
+            </div>
+
+            <div class="progress my-3" style="height: 0.6rem;" role="progressbar"
+                 aria-valuenow="{{ r.percent }}" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar bg-{{ tone }}" style="width: {{ r.percent }}%"></div>
+            </div>
+
+            <div>
+                {% for s in r.matched %}<span class="badge text-bg-success me-1">✓ {{ s }}</span>{% endfor %}
+                {% for s in r.missing %}<span class="badge text-bg-light border text-danger me-1">✗ {{ s }}</span>{% endfor %}
+            </div>
+            {% if r.missing %}
+            <div class="small mt-2"><strong>Missing:</strong> {{ r.missing | join(', ') }}</div>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">No jobs with listed skills to compare against. Add skills to your jobs first.</div>
+    {% endfor %}
+
+    {% if no_skills %}
+    <p class="text-muted small">
+        {{ no_skills }} job{{ '' if no_skills == 1 else 's' }} not shown because no required skills are listed.
+    </p>
+    {% endif %}
+{% endif %}
+{% endblock %}
