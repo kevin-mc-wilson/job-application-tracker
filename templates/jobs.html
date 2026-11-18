@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Jobs - Job Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="mb-0">Jobs</h1>
+    <a href="{{ url_for('add_job') }}" class="btn btn-primary">+ Add Job</a>
+</div>
+
+<div class="card stat-card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Company</th>
+                    <th>Type</th>
+                    <th>Salary</th>
+                    <th>Posted</th>
+                    <th>Skills</th>
+                    <th class="text-center">Apps</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for j in jobs %}
+                <tr>
+                    <td class="fw-semibold">
+                        {% if j.job_url %}<a href="{{ j.job_url }}" target="_blank" rel="noopener">{{ j.job_title }}</a>{% else %}{{ j.job_title }}{% endif %}
+                    </td>
+                    <td>{{ j.company_name }}</td>
+                    <td>{{ j.job_type or '—' }}</td>
+                    <td>
+                        {% if j.salary_min and j.salary_max %}${{ '{:,}'.format(j.salary_min) }} – ${{ '{:,}'.format(j.salary_max) }}
+                        {% elif j.salary_min %}From ${{ '{:,}'.format(j.salary_min) }}
+                        {% elif j.salary_max %}Up to ${{ '{:,}'.format(j.salary_max) }}
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>{{ j.date_posted or '—' }}</td>
+                    <td>
+                        {% for skill in j.skills %}<span class="badge text-bg-secondary me-1">{{ skill }}</span>{% else %}—{% endfor %}
+                    </td>
+                    <td class="text-center">{{ j.application_count }}</td>
+                    <td class="text-end table-actions text-nowrap">
+                        <a href="{{ url_for('edit_job', job_id=j.job_id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        {% set msg = 'Delete ' ~ j.job_title ~ ' at ' ~ j.company_name ~ '?' %}
+                        {% if j.application_count %}
+                            {% set msg = msg ~ ' This will also delete ' ~ j.application_count ~ ' application(s).' %}
+                        {% endif %}
+                        <form method="post" action="{{ url_for('delete_job', job_id=j.job_id) }}"
+                              data-confirm="{{ msg }}"
+                              onsubmit="return confirm(this.dataset.confirm);">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="8" class="text-center text-muted py-4">No jobs yet. Add your first one!</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
