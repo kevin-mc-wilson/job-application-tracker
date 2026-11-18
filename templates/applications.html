@@ -13,7 +13,7 @@
         <label for="status" class="col-form-label">Filter by status:</label>
     </div>
     <div class="col-auto">
-        <select class="form-select" id="status" name="status" onchange="this.form.submit()">
+        <select class="form-select status-filter" id="status" name="status" onchange="this.form.submit()">
             <option value="">All</option>
             {% for s in statuses %}
             <option value="{{ s }}" {{ 'selected' if s == status_filter }}>{{ s }}</option>

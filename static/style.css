@@ -143,6 +143,17 @@ h1, h2, h3, h4, h5 {
     background: rgba(255, 255, 255, 0.7);
 }
 
+}
+
+.side-link i {
+    font-size: 1.05rem;
+    color: var(--muted);
+}
+
+.side-link:hover {
+    background: rgba(255, 255, 255, 0.7);
+}
+
 .side-link.active {
     background: #fff;
     font-weight: 500;
@@ -358,8 +369,175 @@ a:hover > .stat-card {
     padding: 0.85rem 1rem;
 }
 
+/* Edit / Delete buttons: same width on every list page */
+.table-actions {
+    width: 1%; /* shrink the cell to fit the buttons */
+    white-space: nowrap;
+}
+
+.table-actions .btn {
+    display: block;
+    width: 100%;
+    min-width: 5rem;
+    text-align: center;
+}
+
 .table-actions form {
-    display: inline;
+    display: block;
+    margin-top: 0.35rem;
+}
+
+/* Wide enough that the dropdown arrow doesn't clip "Screening" / "Withdrawn" */
+.status-filter {
+    min-width: 12rem;
+    padding-right: 2.5rem;
+}
+
+/* ---------- Buttons, badges, forms ---------- */
+.btn {
+    border-radius: 999px;
+    font-weight: 500;
+    padding-left: 1.1rem;
+    padding-right: 1.1rem;
+}
+
+.btn-sm {
+    padding-left: 0.8rem;
+    padding-right: 0.8rem;
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--forest);
+    --bs-btn-border-color: var(--forest);
+    --bs-btn-hover-bg: var(--forest-2);
+    --bs-btn-hover-border-color: var(--forest-2);
+    --bs-btn-active-bg: var(--forest-2);
+    --bs-btn-active-border-color: var(--forest-2);
+    box-shadow: 0 6px 16px rgba(15, 61, 58, 0.25);
+}
+
+.btn-light {
+    --bs-btn-bg: rgba(255, 255, 255, 0.9);
+    --bs-btn-border-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 12px rgba(40, 90, 140, 0.1);
+}
+
+.btn-outline-secondary {
+    --bs-btn-color: var(--forest);
+    --bs-btn-border-color: rgba(16, 33, 31, 0.18);
+    --bs-btn-hover-bg: var(--forest);
+    --bs-btn-hover-border-color: var(--forest);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-bg: var(--forest-2);
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.btn-outline-danger {
+    --bs-btn-color: var(--rose);
+    --bs-btn-border-color: rgba(229, 100, 110, 0.4);
+    --bs-btn-hover-bg: var(--rose);
+    --bs-btn-hover-border-color: var(--rose);
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.badge {
+    border-radius: 999px;
+    font-weight: 500;
+    padding: 0.4em 0.75em;
+}
+
+.form-control,
+.form-select {
+    border-radius: 0.85rem;
+    border-color: var(--line);
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 0.6rem 0.9rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--mint);
+    box-shadow: 0 0 0 0.25rem rgba(79, 185, 133, 0.22);
+}
+
+.form-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.input-group > .form-control {
+    border-top-left-radius: 999px;
+    border-bottom-left-radius: 999px;
+    padding-left: 1.2rem;
+}
+
+.alert {
+    border: 0;
+    border-radius: 1rem;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 14px rgba(40, 90, 140, 0.12);
+}
+
+/* ---------- Job Match ---------- */
+.progress {
+    background: rgba(16, 33, 31, 0.07);
+    border-radius: 999px;
+}
+
+.progress-bar {
+    border-radius: 999px;
+}
+
+/* ---------- Footer ---------- */
+.app-footer {
+    margin-top: auto;
+    padding: 2rem 0 0.75rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: rgba(16, 33, 31, 0.55);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 991.98px) {
+    .app-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        position: static;
+        height: auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .brand {
+        margin-bottom: 0;
+        width: 100%;
+    }
+
+    .nav-label,
+    .promo {
+        display: none;
+    }
+
+    .side-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .metric-panel {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .metric:nth-child(2) {
+        border-right: 0;
+    }
+
+    .metric:nth-child(-n + 2) {
+        border-bottom: 1px solid var(--line);
+    }
 }
 
 /* ---------- Buttons, badges, forms ---------- */

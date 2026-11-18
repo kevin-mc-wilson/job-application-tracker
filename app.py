@@ -967,4 +967,5 @@ def job_match():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Port 5001: macOS AirPlay Receiver occupies port 5000 and answers localhost:5000 with 403.
+    app.run(debug=True, port=5001)
