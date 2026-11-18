@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Applications - Job Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="mb-0">Applications</h1>
+    <a href="{{ url_for('add_application') }}" class="btn btn-primary">+ Add Application</a>
+</div>
+
+<form method="get" class="row g-2 align-items-center mb-3">
+    <div class="col-auto">
+        <label for="status" class="col-form-label">Filter by status:</label>
+    </div>
+    <div class="col-auto">
+        <select class="form-select" id="status" name="status" onchange="this.form.submit()">
+            <option value="">All</option>
+            {% for s in statuses %}
+            <option value="{{ s }}" {{ 'selected' if s == status_filter }}>{{ s }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</form>
+
+<div class="card stat-card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Job</th>
+                    <th>Company</th>
+                    <th>Applied</th>
+                    <th>Status</th>
+                    <th>Resume</th>
+                    <th class="text-center">Cover letter</th>
+                    <th>Interview</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in applications %}
+                {% set badge = {'Applied': 'primary', 'Screening': 'info', 'Interview': 'warning',
+                                'Offer': 'success', 'Rejected': 'danger', 'Withdrawn': 'secondary'}[a.status] %}
+                <tr>
+                    <td class="fw-semibold">{{ a.job_title }}</td>
+                    <td>{{ a.company_name }}</td>
+                    <td>{{ a.application_date }}</td>
+                    <td><span class="badge text-bg-{{ badge }}">{{ a.status }}</span></td>
+                    <td>{{ a.resume_version or '—' }}</td>
+                    <td class="text-center">{{ '✓' if a.cover_letter_sent else '—' }}</td>
+                    <td>
+                        {% if a.interview.interview_date or a.interview.interviewers or a.interview.feedback %}
+                            {% if a.interview.interview_date %}<div>{{ a.interview.interview_date }}</div>{% endif %}
+                            {% if a.interview.interviewers %}<div class="small text-muted">with {{ a.interview.interviewers | join(', ') }}</div>{% endif %}
+                            {% if a.interview.feedback %}<div class="small">{{ a.interview.feedback }}</div>{% endif %}
+                        {% else %}—{% endif %}
+                    </td>
+                    <td class="text-end table-actions text-nowrap">
+                        <a href="{{ url_for('edit_application', application_id=a.application_id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <form method="post" action="{{ url_for('delete_application', application_id=a.application_id) }}"
+                              data-confirm="Delete your application for {{ a.job_title }} at {{ a.company_name }}?"
+                              onsubmit="return confirm(this.dataset.confirm);">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="8" class="text-center text-muted py-4">
+                    {% if status_filter %}No applications with status “{{ status_filter }}”.{% else %}No applications yet. Add your first one!{% endif %}
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

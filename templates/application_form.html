@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit' if editing else 'Add' }} Application - Job Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="mb-0">{{ 'Edit' if editing else 'Add' }} Application</h1>
+</div>
+
+<div class="card stat-card" style="max-width: 44rem;">
+    <div class="card-body">
+        <form method="post">
+            <div class="mb-3">
+                <label for="job_id" class="form-label">Job <span class="text-danger">*</span></label>
+                <select class="form-select" id="job_id" name="job_id" required>
+                    <option value="">Choose a job…</option>
+                    {% for j in jobs %}
+                    <option value="{{ j.job_id }}" {{ 'selected' if application.job_id == j.job_id }}>{{ j.job_title }} at {{ j.company_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="application_date" class="form-label">Application date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="application_date" name="application_date"
+                           required value="{{ application.application_date or '' }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
+                    <select class="form-select" id="status" name="status" required>
+                        {% for s in statuses %}
+                        <option value="{{ s }}" {{ 'selected' if application.status == s }}>{{ s }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="resume_version" class="form-label">Resume version</label>
+                    <input type="text" class="form-control" id="resume_version" name="resume_version"
+                           maxlength="50" placeholder="v1" value="{{ application.resume_version or '' }}">
+                </div>
+            </div>
+
+            <div class="form-check mb-4">
+                <input class="form-check-input" type="checkbox" id="cover_letter_sent" name="cover_letter_sent"
+                       value="1" {{ 'checked' if application.cover_letter_sent }}>
+                <label class="form-check-label" for="cover_letter_sent">Cover letter sent</label>
+            </div>
+
+            <h2 class="h5">Interview details <small class="text-muted fw-normal">(optional)</small></h2>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="interview_date" class="form-label">Interview date</label>
+                    <input type="date" class="form-control" id="interview_date" name="interview_date"
+                           value="{{ application.interview_date or '' }}">
+                </div>
+                <div class="col-md-8 mb-3">
+                    <label for="interviewers" class="form-label">Interviewers</label>
+                    <input type="text" class="form-control" id="interviewers" name="interviewers"
+                           placeholder="Jane Smith, John Doe" value="{{ application.interviewers_text or '' }}">
+                    <div class="form-text">Separate names with commas.</div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="feedback" class="form-label">Feedback / notes</label>
+                <textarea class="form-control" id="feedback" name="feedback" rows="3">{{ application.feedback or '' }}</textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">{{ 'Save Changes' if editing else 'Add Application' }}</button>
+            <a href="{{ url_for('applications') }}" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

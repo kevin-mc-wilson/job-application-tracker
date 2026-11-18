@@ -4,10 +4,72 @@
 
 {% block content %}
 <h1 class="mb-4">Dashboard</h1>
-<div class="card stat-card" style="max-width: 18rem;">
-    <div class="card-body">
-        <div class="text-muted">Applications</div>
-        <div class="stat-number">{{ stats.count }}</div>
+
+<div class="row g-3 mb-4">
+    {% for label, value, link in [
+        ('Applications', stats.applications, '/applications'),
+        ('Jobs', stats.jobs, '/jobs'),
+        ('Companies', stats.companies, '/companies'),
+        ('Contacts', stats.contacts, '/contacts')
+    ] %}
+    <div class="col-6 col-lg-3">
+        <a href="{{ link }}" class="text-decoration-none text-reset">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="text-muted">{{ label }}</div>
+                    <div class="stat-number">{{ value }}</div>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-4">
+        <div class="card stat-card h-100">
+            <div class="card-header bg-white fw-semibold">Applications by Status</div>
+            <ul class="list-group list-group-flush">
+                {% for row in status_counts %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ row.status }}
+                    <span class="badge bg-primary rounded-pill">{{ row.count }}</span>
+                </li>
+                {% else %}
+                <li class="list-group-item text-muted">No applications yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card stat-card h-100">
+            <div class="card-header bg-white fw-semibold">Recent Applications</div>
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Job</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in recent %}
+                        <tr>
+                            <td>{{ app.company_name }}</td>
+                            <td>{{ app.job_title }}</td>
+                            <td>{{ app.application_date }}</td>
+                            <td>{{ app.status }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" class="text-muted">No applications yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

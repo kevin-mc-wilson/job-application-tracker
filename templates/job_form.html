@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit' if editing else 'Add' }} Job - Job Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="mb-0">{{ 'Edit' if editing else 'Add' }} Job</h1>
+</div>
+
+<div class="card stat-card" style="max-width: 44rem;">
+    <div class="card-body">
+        <form method="post">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="company_id" class="form-label">Company <span class="text-danger">*</span></label>
+                    <select class="form-select" id="company_id" name="company_id" required>
+                        <option value="">Choose a company…</option>
+                        {% for c in companies %}
+                        <option value="{{ c.company_id }}" {{ 'selected' if job.company_id == c.company_id }}>{{ c.company_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="job_title" class="form-label">Job title <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="job_title" name="job_title"
+                           maxlength="100" required value="{{ job.job_title or '' }}">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="job_type" class="form-label">Job type</label>
+                    <select class="form-select" id="job_type" name="job_type">
+                        <option value="">—</option>
+                        {% for t in job_types %}
+                        <option value="{{ t }}" {{ 'selected' if job.job_type == t }}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="salary_min" class="form-label">Salary min ($)</label>
+                    <input type="number" min="0" step="1" class="form-control" id="salary_min" name="salary_min"
+                           value="{{ job.salary_min if job.salary_min is not none else '' }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="salary_max" class="form-label">Salary max ($)</label>
+                    <input type="number" min="0" step="1" class="form-control" id="salary_max" name="salary_max"
+                           value="{{ job.salary_max if job.salary_max is not none else '' }}">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8 mb-3">
+                    <label for="job_url" class="form-label">Job posting URL</label>
+                    <input type="url" class="form-control" id="job_url" name="job_url"
+                           maxlength="300" placeholder="https://…" value="{{ job.job_url or '' }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="date_posted" class="form-label">Date posted</label>
+                    <input type="date" class="form-control" id="date_posted" name="date_posted"
+                           value="{{ job.date_posted or '' }}">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="skills" class="form-label">Required skills</label>
+                <input type="text" class="form-control" id="skills" name="skills"
+                       placeholder="Python, SQL, Flask" value="{{ job.skills_text or '' }}">
+                <div class="form-text">Separate skills with commas. Used by Job Match.</div>
+            </div>
+            <div class="mb-3">
+                <label for="experience" class="form-label">Experience required</label>
+                <input type="text" class="form-control" id="experience" name="experience"
+                       placeholder="3+ years" value="{{ job.experience or '' }}">
+            </div>
+
+            <button type="submit" class="btn btn-primary">{{ 'Save Changes' if editing else 'Add Job' }}</button>
+            <a href="{{ url_for('jobs') }}" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

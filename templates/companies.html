@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Companies - Job Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="mb-0">Companies</h1>
+    <a href="{{ url_for('add_company') }}" class="btn btn-primary">+ Add Company</a>
+</div>
+
+<div class="card stat-card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Industry</th>
+                    <th>Location</th>
+                    <th>Website</th>
+                    <th class="text-center">Jobs</th>
+                    <th class="text-center">Contacts</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in companies %}
+                <tr>
+                    <td class="fw-semibold">
+                        {{ c.company_name }}
+                        {% if c.notes %}<div class="small text-muted fw-normal">{{ c.notes }}</div>{% endif %}
+                    </td>
+                    <td>{{ c.industry or '—' }}</td>
+                    <td>
+                        {% if c.city or c.state %}{{ [c.city, c.state] | select | join(', ') }}{% else %}—{% endif %}
+                    </td>
+                    <td>
+                        {% if c.website %}<a href="{{ c.website }}" target="_blank" rel="noopener">{{ c.website }}</a>{% else %}—{% endif %}
+                    </td>
+                    <td class="text-center">{{ c.job_count }}</td>
+                    <td class="text-center">{{ c.contact_count }}</td>
+                    <td class="text-end table-actions">
+                        <a href="{{ url_for('edit_company', company_id=c.company_id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        {% set msg = 'Delete ' ~ c.company_name ~ '?' %}
+                        {% if c.job_count or c.contact_count %}
+                            {% set msg = msg ~ ' This will also delete ' ~ c.job_count ~ ' job(s) and ' ~ c.contact_count ~ ' contact(s), plus their applications.' %}
+                        {% endif %}
+                        <form method="post" action="{{ url_for('delete_company', company_id=c.company_id) }}"
+                              data-confirm="{{ msg }}"
+                              onsubmit="return confirm(this.dataset.confirm);">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7" class="text-center text-muted py-4">No companies yet. Add your first one!</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
