@@ -4,6 +4,8 @@ A full-stack web application for tracking a job search: the companies you're int
 
 Built for COP4751 with **Python/Flask**, **MySQL**, and **HTML/CSS (Bootstrap 5)**.
 
+[**Demo Video**](https://youtu.be/QsZv-6Vlx0c)
+
 ## Features
 
 - **Dashboard** – totals for applications, jobs, companies and contacts, applications by status, and the five most recent applications.
