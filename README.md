@@ -33,6 +33,7 @@ job-application-tracker/
 ├── templates/        # Jinja2 HTML templates
 ├── static/style.css  # Custom styling
 ├── AI_USAGE.md       # GenAI documentation
+├── COP4751 JobTracker.mp4 # Demo video
 └── README.md
 ```
 
